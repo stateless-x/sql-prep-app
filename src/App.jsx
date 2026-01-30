@@ -7,13 +7,11 @@ import SQLFundamentals from './components/SQLFundamentals'
 import GroupBy from './components/GroupBy'
 import WhereHaving from './components/WhereHaving'
 import Joins from './components/Joins'
-import WindowFunctions from './components/WindowFunctions'
-import WindowPatterns from './components/WindowPatterns'
-import CommonPatterns from './components/CommonPatterns'
+import WindowFunctionsPatterns from './components/WindowFunctionsPatterns'
+import InterviewPatterns from './components/InterviewPatterns'
 import QueryOptimization from './components/QueryOptimization'
-import HackerRankStrategy from './components/HackerRankStrategy'
+import SQLReference from './components/SQLReference'
 import MockTest from './components/MockTest'
-import Cheatsheet from './components/Cheatsheet'
 
 const CHAPTERS = [
   { id: 'diagnostic', title: '🎯 Quick Diagnostic', component: QuickDiagnostic, time: '5 min' },
@@ -22,13 +20,11 @@ const CHAPTERS = [
   { id: 'groupby', title: '📊 GROUP BY & Aggregates', component: GroupBy, time: '15 min' },
   { id: 'where-having', title: '⚖️ WHERE vs HAVING', component: WhereHaving, time: '10 min' },
   { id: 'joins', title: '🔗 JOINs', component: Joins, time: '20 min' },
-  { id: 'window', title: '🪟 Window Functions', component: WindowFunctions, time: '30 min' },
-  { id: 'window-patterns', title: '🎯 Window Patterns', component: WindowPatterns, time: '20 min' },
-  { id: 'patterns', title: '🎨 Common Patterns', component: CommonPatterns, time: '20 min' },
+  { id: 'window', title: '🪟 Window Functions & Patterns', component: WindowFunctionsPatterns, time: '40 min' },
+  { id: 'interview-patterns', title: '🎯 Interview Patterns & Strategy', component: InterviewPatterns, time: '40 min' },
   { id: 'query-optimization', title: '🚀 Query Optimization', component: QueryOptimization, time: '15 min' },
-  { id: 'hackerrank-strategy', title: '🎯 HackerRank Strategy', component: HackerRankStrategy, time: '15 min' },
-  { id: 'mock', title: '🎬 Mock Test', component: MockTest, time: '60 min' },
-  { id: 'cheatsheet', title: '📋 Cheatsheet', component: Cheatsheet, time: '5 min' }
+  { id: 'sql-reference', title: '📋 SQL Reference & Cheatsheet', component: SQLReference, time: '35 min' },
+  { id: 'mock', title: '🎬 Mock Test', component: MockTest, time: '60 min' }
 ]
 
 function App() {

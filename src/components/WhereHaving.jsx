@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import Quiz from './Quiz'
 import CodeBlock from './CodeBlock'
+import LearningObjectives from './LearningObjectives'
+import TLDRBox from './TLDRBox'
+import KeyTakeaways from './KeyTakeaways'
+import TryThis from './TryThis'
+import RecallBox from './RecallBox'
 
 const quizQuestion = {
   id: 1,
@@ -28,6 +33,25 @@ export default function WhereHaving({ onComplete, isCompleted }) {
         <p className="chapter-subtitle">This was your weak spot!</p>
       </div>
 
+      <LearningObjectives
+        objectives={[
+          'When WHERE runs vs when HAVING runs',
+          'Why you can\'t use aggregates in WHERE',
+          'How to choose the right one for your filter',
+          'Avoid common WHERE/HAVING mistakes'
+        ]}
+        time="10 min"
+      />
+
+      <TLDRBox
+        points={[
+          'WHERE = BEFORE grouping (no aggregates!)',
+          'HAVING = AFTER grouping (use aggregates!)',
+          'Row filter → WHERE | Group filter → HAVING',
+          'WHERE filters rows, HAVING filters groups'
+        ]}
+      />
+
       <div className="alert alert-warning">
         <strong>⚠️ CRITICAL:</strong> This is where many people fail. Master this!
       </div>
@@ -39,6 +63,11 @@ export default function WhereHaving({ onComplete, isCompleted }) {
         <br />
         WHERE checks individual records → HAVING checks summary/group totals
       </div>
+
+      <RecallBox
+        chapter="SQL Fundamentals"
+        concept="Execution order: FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT"
+      />
 
       <div className="section">
         <h2 className="section-title">The Rule (Memorize This)</h2>
@@ -177,6 +206,17 @@ HAVING SUM(amount) > 5000;    -- ✅ Then filter groups (aggregated totals)`} />
     └── Examples: SUM(amount) > 1000, COUNT(*) >= 5`} />
       </div>
 
+      <TryThis
+        challenge='Write a query: "Find cities with more than 10 hotels, but only count 4+ star hotels"'
+        hint="Think: What needs to be filtered before counting? What needs to be filtered after?"
+        solution={`SELECT city, COUNT(*) AS hotel_count
+FROM hotels
+WHERE star_rating >= 4    -- Filter individual hotels BEFORE counting
+GROUP BY city
+HAVING COUNT(*) > 10;     -- Filter cities AFTER counting`}
+        explanation="✅ WHERE filters individual hotels (row-level: star_rating). HAVING filters cities by their count (group-level: COUNT(*)). WHERE runs first, then GROUP BY collapses rows, then HAVING checks the count."
+      />
+
       <div className="section">
         <h2 className="section-title">✅ Quiz Time</h2>
         <Quiz
@@ -193,6 +233,18 @@ HAVING SUM(amount) > 5000;    -- ✅ Then filter groups (aggregated totals)`} />
           </button>
         )}
       </div>
+
+      <KeyTakeaways
+        points={[
+          'WHERE runs before GROUP BY (filters rows)',
+          'HAVING runs after GROUP BY (filters groups)',
+          'Can\'t use SUM/COUNT/AVG in WHERE',
+          'Put row filters in WHERE, aggregate filters in HAVING',
+          'WHERE is more efficient (filters before expensive grouping)'
+        ]}
+        nextChapter="Read '🔗 JOINs' to combine tables"
+        relatedChapters="'📊 GROUP BY' creates the groups that HAVING filters"
+      />
 
       <button
         className={`complete-btn ${isCompleted ? 'completed' : ''}`}
