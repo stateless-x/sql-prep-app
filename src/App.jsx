@@ -8,6 +8,7 @@ import GroupBy from './components/GroupBy'
 import WhereHaving from './components/WhereHaving'
 import Joins from './components/Joins'
 import WindowFunctions from './components/WindowFunctions'
+import WindowPatterns from './components/WindowPatterns'
 import CommonPatterns from './components/CommonPatterns'
 import MockTest from './components/MockTest'
 import Cheatsheet from './components/Cheatsheet'
@@ -20,6 +21,7 @@ const CHAPTERS = [
   { id: 'where-having', title: '⚖️ WHERE vs HAVING', component: WhereHaving, time: '10 min' },
   { id: 'joins', title: '🔗 JOINs', component: Joins, time: '20 min' },
   { id: 'window', title: '🪟 Window Functions', component: WindowFunctions, time: '30 min' },
+  { id: 'window-patterns', title: '🎯 Window Patterns', component: WindowPatterns, time: '20 min' },
   { id: 'patterns', title: '🎨 Common Patterns', component: CommonPatterns, time: '20 min' },
   { id: 'mock', title: '🎬 Mock Test', component: MockTest, time: '60 min' },
   { id: 'cheatsheet', title: '📋 Cheatsheet', component: Cheatsheet, time: '5 min' }

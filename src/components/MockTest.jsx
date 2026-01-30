@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const problems = [
   {
@@ -65,6 +65,34 @@ export default function MockTest({ onComplete, isCompleted }) {
   const [timerStarted, setTimerStarted] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(60 * 60) // 60 minutes in seconds
 
+  // Load answers from localStorage
+  const [answers, setAnswers] = useState(() => {
+    const saved = localStorage.getItem('mockTestAnswers')
+    return saved ? JSON.parse(saved) : {}
+  })
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('mockTestAnswers', JSON.stringify(answers))
+  }, [answers])
+
+  const handleAnswerChange = (problemId, value) => {
+    setAnswers(prev => ({
+      ...prev,
+      [problemId]: value
+    }))
+  }
+
+  const handleReset = () => {
+    if (window.confirm('⚠️ Are you sure you want to reset all your answers? This cannot be undone!')) {
+      setAnswers({})
+      localStorage.removeItem('mockTestAnswers')
+      setTimerStarted(false)
+      setTimeRemaining(60 * 60)
+      setShowSolutions(false)
+    }
+  }
+
   const startTimer = () => {
     setTimerStarted(true)
     const interval = setInterval(() => {
@@ -90,10 +118,12 @@ export default function MockTest({ onComplete, isCompleted }) {
 
       <div className="alert alert-warning">
         <strong>⏱️ Instructions:</strong><br />
-        1. Set a 60-minute timer<br />
-        2. No looking at notes<br />
-        3. Write actual queries<br />
-        4. Move on if stuck
+        1. Click "Start Timer" for 60-minute countdown<br />
+        2. Type your SQL answers in the text boxes<br />
+        3. Your answers auto-save to browser (persist across refresh!)<br />
+        4. No looking at notes during the test<br />
+        5. Use "Reset All Answers" to clear and start fresh<br />
+        6. Check solutions after you finish (or if you're stuck)
       </div>
 
       {!timerStarted ? (
@@ -124,8 +154,33 @@ searches (search_id, user_id, destination, search_date, converted)`}</code></pre
           <h2 className="section-title">{problem.title}</h2>
           <p className="section-content">{problem.question}</p>
 
-          <div className="code-block">
-            <pre><code>-- Your answer:</code></pre>
+          <div className="mt-2">
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+              Your SQL Answer:
+            </label>
+            <textarea
+              value={answers[problem.id] || ''}
+              onChange={(e) => handleAnswerChange(problem.id, e.target.value)}
+              placeholder="-- Write your SQL query here..."
+              style={{
+                width: '100%',
+                minHeight: '150px',
+                padding: '1rem',
+                background: 'var(--code-bg)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                color: 'var(--text-primary)',
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.9rem',
+                lineHeight: '1.6',
+                resize: 'vertical'
+              }}
+            />
+            {answers[problem.id] && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--success)', marginTop: '0.5rem' }}>
+                ✅ Answer saved! ({answers[problem.id].length} characters)
+              </p>
+            )}
           </div>
 
           {showSolutions && (
@@ -141,12 +196,22 @@ searches (search_id, user_id, destination, search_date, converted)`}</code></pre
         </div>
       ))}
 
-      <button
-        className="quiz-btn"
-        onClick={() => setShowSolutions(!showSolutions)}
-      >
-        {showSolutions ? 'Hide Solutions' : 'Show Solutions'}
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <button
+          className="quiz-btn"
+          onClick={() => setShowSolutions(!showSolutions)}
+        >
+          {showSolutions ? 'Hide Solutions' : 'Show Solutions'}
+        </button>
+
+        <button
+          className="quiz-btn"
+          onClick={handleReset}
+          style={{ background: 'var(--danger)' }}
+        >
+          🗑️ Reset All Answers
+        </button>
+      </div>
 
       <div className="section mt-3">
         <h2 className="section-title">Scoring</h2>
