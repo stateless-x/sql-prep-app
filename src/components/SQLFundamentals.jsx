@@ -27,6 +27,9 @@ export default function SQLFundamentals({ onComplete, isCompleted }) {
         <button className={`tab ${activeTab === 'nulls' ? 'active' : ''}`} onClick={() => setActiveTab('nulls')}>
           ⚡ NULL Handling
         </button>
+        <button className={`tab ${activeTab === 'complex' ? 'active' : ''}`} onClick={() => setActiveTab('complex')}>
+          🧩 Reading Complex SQL
+        </button>
       </div>
 
       {activeTab === 'order' && (
@@ -262,6 +265,149 @@ SELECT AVG(rating) FROM reviews;  -- NULLs not included in average`} />
 
           <div className="alert alert-info mt-2">
             <strong>💡 Interview Tip:</strong> Always consider NULLs in your queries. Ask: "What happens if this column is NULL?"
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'complex' && (
+        <div className="section">
+          <h2 className="section-title">🧩 How to Read Complex SQL</h2>
+
+          <div className="alert alert-info">
+            <strong>💡 Key Strategy:</strong> Read from inside-out, bottom-up. Start with the innermost query/CTE and work your way out.
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Step 1: Identify the Structure</h3>
+            <p>Look for these patterns:</p>
+            <ul>
+              <li><strong>CTEs (WITH clauses)</strong> — Temporary named result sets</li>
+              <li><strong>Subqueries</strong> — Queries inside parentheses</li>
+              <li><strong>Window functions</strong> — OVER() clauses</li>
+              <li><strong>Multiple JOINs</strong> — Chain of table combinations</li>
+            </ul>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Step 2: Read CTEs First (WITH clauses)</h3>
+            <p><strong>Think of CTEs as temporary tables you create before the main query.</strong></p>
+            <CodeBlock code={`WITH step1 AS (
+    -- Read this FIRST: "Create a temp table called step1"
+    SELECT user_id, SUM(amount) AS total
+    FROM bookings
+    GROUP BY user_id
+),
+step2 AS (
+    -- Read this SECOND: "Create another temp table using step1"
+    SELECT user_id, total,
+           RANK() OVER (ORDER BY total DESC) AS rank
+    FROM step1
+)
+-- Read this LAST: "Now use those temp tables"
+SELECT * FROM step2 WHERE rank <= 10;`} />
+            <div className="alert alert-success mt-2">
+              <strong>✅ Reading Strategy:</strong> Name each CTE in your head: "Step 1 calculates totals, Step 2 ranks them, Final query gets top 10"
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Step 3: Break Down Complex Conditions</h3>
+            <p><strong>Separate AND/OR logic into bullet points</strong></p>
+            <CodeBlock code={`-- Hard to read:
+WHERE (status = 'completed' AND amount > 100) OR (status = 'pending' AND created_at > '2024-01-01')
+
+-- Mental breakdown:
+-- Show rows where:
+--   • (status is completed AND amount > 100)
+--   OR
+--   • (status is pending AND created recently)`} />
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Step 4: Trace the Data Flow</h3>
+            <p><strong>For each step, ask: "What grain am I at?"</strong></p>
+            <CodeBlock code={`WITH user_totals AS (
+    -- Grain: ONE ROW PER USER
+    SELECT user_id, SUM(amount) AS total
+    FROM bookings  -- Grain: ONE ROW PER BOOKING
+    GROUP BY user_id
+)
+SELECT u.email, ut.total
+FROM users u  -- Grain: ONE ROW PER USER
+JOIN user_totals ut ON u.user_id = ut.user_id;
+-- Result grain: ONE ROW PER USER (with email)`} />
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Step 5: Subquery Reading Order</h3>
+            <CodeBlock code={`-- Read order: 3 → 2 → 1
+SELECT u.email  -- 1. Final: Get emails
+FROM users u
+WHERE u.user_id IN (  -- 2. Filter: Only these user_ids
+    SELECT user_id  -- 3. Start here: Which user_ids?
+    FROM bookings
+    WHERE amount > 1000
+);`} />
+            <div className="alert alert-info mt-2">
+              <strong>💡 Tip:</strong> Subqueries in WHERE run first, then the outer query uses those results to filter.
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Step 6: Window Functions in Complex Queries</h3>
+            <p><strong>Remember: Window functions run AFTER WHERE/GROUP BY but BEFORE ORDER BY</strong></p>
+            <CodeBlock code={`WITH ranked_bookings AS (
+    -- 1. Start: Filter and calculate
+    SELECT
+        user_id,
+        booking_date,
+        amount,
+        -- 2. Add window function (runs after WHERE)
+        ROW_NUMBER() OVER (
+            PARTITION BY user_id
+            ORDER BY booking_date DESC
+        ) AS recency_rank
+    FROM bookings
+    WHERE status = 'completed'
+)
+-- 3. Finally: Filter window function results
+SELECT * FROM ranked_bookings WHERE recency_rank = 1;`} />
+          </div>
+
+          <h2 className="section-title mt-3">🎯 Interview Tips for Complex SQL</h2>
+
+          <div className="card">
+            <h3 className="card-title">1. Talk Through Your Reading</h3>
+            <p>In interviews, verbalize your thought process:</p>
+            <ul>
+              <li>"I see a CTE called user_totals that aggregates bookings per user..."</li>
+              <li>"Then the main query joins that with users to get emails..."</li>
+              <li>"The WHERE clause filters completed bookings only..."</li>
+            </ul>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">2. Ask About Grain at Each Step</h3>
+            <p>Show you understand data transformations:</p>
+            <ul>
+              <li>"After this GROUP BY, we're at one row per user"</li>
+              <li>"This JOIN will keep the same grain since it's 1-to-1"</li>
+              <li>"The window function preserves all rows but adds a calculated column"</li>
+            </ul>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">3. Identify the "Why"</h3>
+            <p>Understand the business logic:</p>
+            <ul>
+              <li>"This CTE calculates total spend per user for ranking"</li>
+              <li>"The LEFT JOIN keeps all users, even those without bookings"</li>
+              <li>"The HAVING filters out users below the threshold"</li>
+            </ul>
+          </div>
+
+          <div className="alert alert-warning mt-2">
+            <strong>⚡ Pro Tip:</strong> When stuck on complex SQL in an interview, start by identifying all the CTEs and naming what each one does. This shows structured thinking!
           </div>
         </div>
       )}
