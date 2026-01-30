@@ -81,16 +81,64 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
             <strong>Solution:</strong> Window functions — aggregate WITHOUT collapsing!
           </p>
 
-          <div className="code-block mt-2">
-            <pre><code>{`GROUP BY (collapses):           WINDOW (preserves all rows):
-┌─────────┬───────────┐        ┌─────────┬────────┬───────────┐
-│ user_id │ total     │        │ user_id │ amount │ user_total│
-├─────────┼───────────┤        ├─────────┼────────┼───────────┤
-│ 1       │ 550       │        │ 1       │ 200    │ 550       │
-│ 2       │ 800       │        │ 1       │ 350    │ 550       │
-└─────────┴───────────┘        │ 2       │ 800    │ 800       │
-   2 rows                      └─────────┴────────┴───────────┘
-                                  3 rows (all preserved!)`}</code></pre>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+            <div>
+              <h4 style={{ color: 'var(--warning)', marginBottom: '0.75rem', fontSize: '1rem' }}>❌ GROUP BY (collapses)</h4>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>user_id</th>
+                      <th>total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>550</td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>800</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>2 rows (collapsed)</p>
+            </div>
+
+            <div>
+              <h4 style={{ color: 'var(--success)', marginBottom: '0.75rem', fontSize: '1rem' }}>✅ WINDOW (preserves all rows)</h4>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>user_id</th>
+                      <th>amount</th>
+                      <th>user_total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>200</td>
+                      <td>550</td>
+                    </tr>
+                    <tr>
+                      <td>1</td>
+                      <td>350</td>
+                      <td>550</td>
+                    </tr>
+                    <tr>
+                      <td>2</td>
+                      <td>800</td>
+                      <td>800</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>3 rows (all preserved!)</p>
+            </div>
           </div>
 
           <div className="alert alert-info mt-2">
@@ -151,15 +199,43 @@ FROM bookings;`}</code></pre>
           </div>
 
           <p className="section-content mt-2"><strong>Result:</strong></p>
-          <div className="code-block">
-            <pre><code>{`┌─────────┬─────────────┬────────┬───────────────┐
-│ user_id │ booking_date│ amount │ running_total │
-├─────────┼─────────────┼────────┼───────────────┤
-│ 1       │ Jan 1       │ 200    │ 200           │
-│ 1       │ Jan 5       │ 350    │ 550           │ ← 200+350
-│ 1       │ Jan 10      │ 100    │ 650           │ ← 550+100
-│ 2       │ Jan 2       │ 800    │ 800           │ ← RESET
-└─────────┴─────────────┴────────┴───────────────┘`}</code></pre>
+          <div className="table-container mt-2">
+            <table>
+              <thead>
+                <tr>
+                  <th>user_id</th>
+                  <th>booking_date</th>
+                  <th>amount</th>
+                  <th>running_total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Jan 1</td>
+                  <td>200</td>
+                  <td>200</td>
+                </tr>
+                <tr style={{ background: 'rgba(99, 102, 241, 0.1)' }}>
+                  <td>1</td>
+                  <td>Jan 5</td>
+                  <td>350</td>
+                  <td><strong>550</strong> <span style={{ color: 'var(--success)' }}>← 200+350</span></td>
+                </tr>
+                <tr style={{ background: 'rgba(99, 102, 241, 0.1)' }}>
+                  <td>1</td>
+                  <td>Jan 10</td>
+                  <td>100</td>
+                  <td><strong>650</strong> <span style={{ color: 'var(--success)' }}>← 550+100</span></td>
+                </tr>
+                <tr style={{ background: 'rgba(236, 72, 153, 0.1)' }}>
+                  <td>2</td>
+                  <td>Jan 2</td>
+                  <td>800</td>
+                  <td><strong>800</strong> <span style={{ color: 'var(--warning)' }}>← RESET</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <div className="alert alert-warning mt-2">
@@ -254,14 +330,41 @@ LEAD(column, n)  -- Value from n rows AFTER`}</code></pre>
 FROM bookings;`}</code></pre>
           </div>
 
-          <div className="code-block mt-2">
-            <pre><code>{`┌─────────┬─────────────┬────────┬─────────────┬────────┐
-│ user_id │ booking_date│ amount │ prev_amount │ change │
-├─────────┼─────────────┼────────┼─────────────┼────────┤
-│ 1       │ Jan 1       │ 200    │ NULL        │ NULL   │
-│ 1       │ Jan 5       │ 350    │ 200         │ 150    │
-│ 1       │ Jan 10      │ 100    │ 350         │ -250   │
-└─────────┴─────────────┴────────┴─────────────┴────────┘`}</code></pre>
+          <div className="table-container mt-2">
+            <table>
+              <thead>
+                <tr>
+                  <th>user_id</th>
+                  <th>booking_date</th>
+                  <th>amount</th>
+                  <th>prev_amount</th>
+                  <th>change</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Jan 1</td>
+                  <td>200</td>
+                  <td><em style={{ color: 'var(--text-muted)' }}>NULL</em></td>
+                  <td><em style={{ color: 'var(--text-muted)' }}>NULL</em></td>
+                </tr>
+                <tr style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
+                  <td>1</td>
+                  <td>Jan 5</td>
+                  <td>350</td>
+                  <td>200</td>
+                  <td><strong style={{ color: 'var(--success)' }}>+150</strong></td>
+                </tr>
+                <tr style={{ background: 'rgba(239, 68, 68, 0.1)' }}>
+                  <td>1</td>
+                  <td>Jan 10</td>
+                  <td>100</td>
+                  <td>350</td>
+                  <td><strong style={{ color: 'var(--danger)' }}>-250</strong></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       )}

@@ -63,15 +63,33 @@ LEFT JOIN bookings b ON u.user_id = b.user_id;`}</code></pre>
             <p className="section-content mt-1">
               ✅ Result: ALL users appear. No bookings = NULL.
             </p>
-            <div className="code-block mt-1">
-              <pre><code>{`┌─────────┬────────┐
-│ email   │ amount │
-├─────────┼────────┤
-│ a@mail  │ 200    │
-│ a@mail  │ 350    │
-│ b@mail  │ 800    │
-│ c@mail  │ NULL   │  ← No bookings
-└─────────┴────────┘`}</code></pre>
+            <div className="table-container mt-1">
+              <table>
+                <thead>
+                  <tr>
+                    <th>email</th>
+                    <th>amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>a@mail</td>
+                    <td>200</td>
+                  </tr>
+                  <tr>
+                    <td>a@mail</td>
+                    <td>350</td>
+                  </tr>
+                  <tr>
+                    <td>b@mail</td>
+                    <td>800</td>
+                  </tr>
+                  <tr style={{ background: 'rgba(245, 158, 11, 0.1)' }}>
+                    <td>c@mail</td>
+                    <td><em style={{ color: 'var(--text-muted)' }}>NULL</em> <span style={{ color: 'var(--warning)' }}>← No bookings</span></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

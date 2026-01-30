@@ -20,6 +20,12 @@ export default function SQLFundamentals({ onComplete, isCompleted }) {
         <button className={`tab ${activeTab === 'ops' ? 'active' : ''}`} onClick={() => setActiveTab('ops')}>
           ⚙️ Core Operations
         </button>
+        <button className={`tab ${activeTab === 'distinct' ? 'active' : ''}`} onClick={() => setActiveTab('distinct')}>
+          🔍 DISTINCT & UNION
+        </button>
+        <button className={`tab ${activeTab === 'nulls' ? 'active' : ''}`} onClick={() => setActiveTab('nulls')}>
+          ⚡ NULL Handling
+        </button>
       </div>
 
       {activeTab === 'order' && (
@@ -141,6 +147,146 @@ JOIN users u ON b.user_id = u.user_id`}</code></pre>
             <div className="code-block">
               <pre><code>{`ORDER BY total DESC LIMIT 10`}</code></pre>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'distinct' && (
+        <div className="section">
+          <h2 className="section-title">DISTINCT vs GROUP BY</h2>
+
+          <div className="card">
+            <h3 className="card-title">DISTINCT — Remove duplicates</h3>
+            <div className="code-block">
+              <pre><code>{`-- Get unique countries
+SELECT DISTINCT country FROM users;
+
+-- Unique combinations
+SELECT DISTINCT country, account_type FROM users;`}</code></pre>
+            </div>
+            <p className="mt-1"><strong>When to use:</strong> Simple deduplication, no aggregates needed</p>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">GROUP BY — Dedupe + aggregate</h3>
+            <div className="code-block">
+              <pre><code>{`-- Count users per country
+SELECT country, COUNT(*) FROM users GROUP BY country;`}</code></pre>
+            </div>
+            <p className="mt-1"><strong>When to use:</strong> When you need counts, sums, or other aggregates</p>
+          </div>
+
+          <h2 className="section-title mt-3">UNION vs UNION ALL</h2>
+
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>UNION</th>
+                  <th>UNION ALL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Duplicates</strong></td>
+                  <td>Removed (slower)</td>
+                  <td>Kept (faster)</td>
+                </tr>
+                <tr>
+                  <td><strong>Use when</strong></td>
+                  <td>Need unique results</td>
+                  <td>Duplicates OK or impossible</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="code-block mt-2">
+            <pre><code>{`-- Combine results from two queries
+SELECT user_id FROM premium_users
+UNION ALL
+SELECT user_id FROM trial_users;
+
+-- Remove duplicates if user is in both
+SELECT user_id FROM premium_users
+UNION
+SELECT user_id FROM trial_users;`}</code></pre>
+          </div>
+
+          <div className="alert alert-warning mt-2">
+            <strong>⚡ Performance Tip:</strong> Use UNION ALL when possible - it's faster because it doesn't check for duplicates!
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'nulls' && (
+        <div className="section">
+          <h2 className="section-title">NULL Handling</h2>
+
+          <div className="alert alert-warning">
+            <strong>⚠️ NULL ≠ empty string ≠ 0</strong><br />
+            NULL means "unknown" or "missing value"
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Checking for NULL</h3>
+            <div className="code-block">
+              <pre><code>{`-- ❌ WRONG: Never use = or !=
+WHERE country = NULL    -- Always returns no rows!
+WHERE country != NULL   -- Always returns no rows!
+
+-- ✅ RIGHT: Use IS NULL / IS NOT NULL
+WHERE country IS NULL
+WHERE country IS NOT NULL`}</code></pre>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">COALESCE — Default values</h3>
+            <div className="code-block">
+              <pre><code>{`-- Return first non-NULL value
+SELECT
+    user_id,
+    COALESCE(phone, email, 'No contact') AS contact
+FROM users;
+
+-- Replace NULL with 0 in calculations
+SELECT
+    hotel_id,
+    COALESCE(SUM(amount), 0) AS total_revenue
+FROM bookings
+GROUP BY hotel_id;`}</code></pre>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">NULLIF — Avoid divide by zero</h3>
+            <div className="code-block">
+              <pre><code>{`-- Without NULLIF - crashes if bookings = 0
+revenue / bookings
+
+-- With NULLIF - returns NULL instead of error
+revenue / NULLIF(bookings, 0)`}</code></pre>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">NULL in aggregates</h3>
+            <div className="code-block">
+              <pre><code>{`-- COUNT(*) counts all rows
+SELECT COUNT(*) FROM users;  -- Includes rows with NULL
+
+-- COUNT(column) ignores NULLs
+SELECT COUNT(phone) FROM users;  -- Only counts non-NULL phones
+
+-- Other aggregates (SUM, AVG, etc.) ignore NULLs
+SELECT AVG(rating) FROM reviews;  -- NULLs not included in average`}</code></pre>
+            </div>
+          </div>
+
+          <div className="alert alert-info mt-2">
+            <strong>💡 Interview Tip:</strong> Always consider NULLs in your queries. Ask: "What happens if this column is NULL?"
           </div>
         </div>
       )}

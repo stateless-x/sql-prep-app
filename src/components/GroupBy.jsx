@@ -33,15 +33,60 @@ export default function GroupBy({ onComplete, isCompleted }) {
           Collapses rows into groups, then applies aggregate functions.
         </p>
 
-        <div className="code-block mt-2">
-          <pre><code>{`BEFORE:                      AFTER GROUP BY user_id:
-┌─────────┬────────┐        ┌─────────┬─────────────┐
-│ user_id │ amount │        │ user_id │ total_spent │
-├─────────┼────────┤        ├─────────┼─────────────┤
-│ 1       │ 200    │   ──►  │ 1       │ 550         │
-│ 1       │ 350    │        │ 2       │ 800         │
-│ 2       │ 800    │        └─────────┴─────────────┘
-└─────────┴────────┘           (2 rows - collapsed)`}</code></pre>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem', alignItems: 'center' }}>
+          <div>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.75rem', fontSize: '1rem' }}>BEFORE:</h4>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>user_id</th>
+                    <th>amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>200</td>
+                  </tr>
+                  <tr>
+                    <td>1</td>
+                    <td>350</td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td>800</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>3 rows</p>
+          </div>
+
+          <div>
+            <h4 style={{ color: 'var(--success)', marginBottom: '0.75rem', fontSize: '1rem' }}>AFTER GROUP BY user_id:</h4>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>user_id</th>
+                    <th>total_spent</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td><strong>550</strong></td>
+                  </tr>
+                  <tr>
+                    <td>2</td>
+                    <td><strong>800</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>2 rows (collapsed)</p>
+          </div>
         </div>
       </div>
 
