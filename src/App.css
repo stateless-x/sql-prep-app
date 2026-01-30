@@ -53,7 +53,7 @@ code, pre {
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 100;
+  z-index: 1001;
   background: var(--primary);
   color: white;
   border: none;
@@ -66,7 +66,7 @@ code, pre {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .mobile-menu-btn:hover {
@@ -74,10 +74,15 @@ code, pre {
   background: var(--primary-dark);
 }
 
+.mobile-menu-btn:active {
+  transform: scale(0.95);
+}
+
 .content-wrapper {
   max-width: 900px;
   margin: 0 auto;
   padding: 2rem;
+  transition: padding 0.3s ease;
 }
 
 /* Chapter Styles */
@@ -484,6 +489,23 @@ td strong, td code {
 }
 
 /* Responsive */
+
+/* iPad and Tablet */
+@media (max-width: 1024px) {
+  .main-content.sidebar-open {
+    margin-left: 0;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
+
+  .content-wrapper {
+    padding: 5rem 1.5rem 2rem;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
   .main-content.sidebar-open {
     margin-left: 0;
@@ -494,11 +516,15 @@ td strong, td code {
   }
 
   .content-wrapper {
-    padding: 1rem;
+    padding: 5rem 1rem 2rem;
   }
 
   .chapter-title {
     font-size: 2rem;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
   }
 
   .code-block {
@@ -507,6 +533,11 @@ td strong, td code {
 
   .tabs {
     flex-wrap: nowrap;
+  }
+
+  .tab {
+    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
   }
 
   /* Stack side-by-side tables on mobile */
@@ -521,20 +552,58 @@ td strong, td code {
   th, td {
     padding: 0.75rem 0.85rem;
   }
+
+  .alert {
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
 }
 
+/* Small Mobile */
 @media (max-width: 480px) {
+  .content-wrapper {
+    padding: 5rem 0.75rem 1.5rem;
+  }
+
   .chapter-title {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
   }
 
   .section {
-    padding: 1rem;
+    padding: 1.25rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
   }
 
   .quiz-question {
     padding: 1rem;
     font-size: 1rem;
+  }
+
+  .quiz-option {
+    padding: 0.875rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .mobile-menu-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .tab {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.875rem;
+  }
+
+  th, td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.875rem;
   }
 }
 
