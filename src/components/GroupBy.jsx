@@ -30,8 +30,20 @@ export default function GroupBy({ onComplete, isCompleted }) {
 
       <div className="section">
         <h2 className="section-title">What GROUP BY Does</h2>
-        <p className="section-content">
-          Collapses rows into groups, then applies aggregate functions.
+
+        <div className="alert alert-info">
+          <strong>🎯 Think of GROUP BY like organizing receipts:</strong><br />
+          You have 10 receipts scattered on your desk.<br />
+          GROUP BY user_id = Put all receipts from the same person into piles.<br />
+          Then COUNT(*) or SUM(amount) = Count or add up each pile!
+        </div>
+
+        <p className="section-content mt-2">
+          <strong>Step-by-step what happens:</strong><br />
+          1. Database looks at the GROUP BY column(s)<br />
+          2. Finds all rows with the SAME value(s)<br />
+          3. Collapses them into ONE row per unique value<br />
+          4. Applies aggregate functions (SUM, COUNT, etc.) to each group
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem', alignItems: 'center' }}>
@@ -89,6 +101,18 @@ export default function GroupBy({ onComplete, isCompleted }) {
             <p style={{ textAlign: 'center', marginTop: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>2 rows (collapsed)</p>
           </div>
         </div>
+
+        <div className="alert alert-success mt-2">
+          <strong>✅ What just happened?</strong><br />
+          <br />
+          <strong>Before:</strong> 3 rows, user_id 1 appears twice<br />
+          <strong>After:</strong> 2 rows, each user_id appears ONCE<br />
+          <br />
+          User 1's two amounts (200 + 350) were <strong>SUMMED</strong> into 550<br />
+          User 2 only had one row, so their amount stayed 800<br />
+          <br />
+          <strong>Key insight:</strong> GROUP BY creates one row per unique value (or combination of values)
+        </div>
       </div>
 
       <div className="section">
@@ -99,15 +123,43 @@ export default function GroupBy({ onComplete, isCompleted }) {
           2. Inside an aggregate function
         </div>
 
-        <div className="mt-2">
+        <p className="section-content mt-2">
+          <strong>Why this rule exists:</strong><br />
+          After GROUP BY, you have ONE row per group. If a column isn't in GROUP BY or an aggregate,
+          SQL doesn't know WHICH value to pick from the collapsed rows!
+        </p>
+
+        <div className="card mt-2">
+          <h3 className="card-title">❌ Example: What Goes Wrong</h3>
           <CodeBlock code={`-- ❌ WRONG: email not in GROUP BY or aggregate
 SELECT user_id, email, SUM(amount)
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id
+GROUP BY user_id;`} />
+          <p className="mt-2">
+            <strong style={{ color: 'var(--danger)' }}>The Problem:</strong><br />
+            User 1 might have 3 bookings. After GROUP BY user_id, they're collapsed into ONE row.<br />
+            But which email should SQL show? The database doesn't know, so it throws an error!
+          </p>
+        </div>
+
+        <div className="card mt-2">
+          <h3 className="card-title">✅ Solutions</h3>
+          <CodeBlock code={`-- Solution 1: Add email to GROUP BY
+SELECT user_id, email, SUM(amount)
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id
+GROUP BY user_id, email;
+
+-- Solution 2: Remove email (if you don't need it)
+SELECT user_id, SUM(amount)
 FROM bookings
 GROUP BY user_id;
 
--- ✅ RIGHT
-SELECT user_id, SUM(amount)
-FROM bookings
+-- Solution 3: Use aggregate on email (if it varies)
+SELECT user_id, MAX(email) AS any_email, SUM(amount)
+FROM bookings b
+JOIN users u ON b.user_id = u.user_id
 GROUP BY user_id;`} />
         </div>
       </div>
