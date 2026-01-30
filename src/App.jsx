@@ -10,6 +10,8 @@ import Joins from './components/Joins'
 import WindowFunctions from './components/WindowFunctions'
 import WindowPatterns from './components/WindowPatterns'
 import CommonPatterns from './components/CommonPatterns'
+import QueryOptimization from './components/QueryOptimization'
+import HackerRankStrategy from './components/HackerRankStrategy'
 import MockTest from './components/MockTest'
 import Cheatsheet from './components/Cheatsheet'
 
@@ -23,6 +25,8 @@ const CHAPTERS = [
   { id: 'window', title: '🪟 Window Functions', component: WindowFunctions, time: '30 min' },
   { id: 'window-patterns', title: '🎯 Window Patterns', component: WindowPatterns, time: '20 min' },
   { id: 'patterns', title: '🎨 Common Patterns', component: CommonPatterns, time: '20 min' },
+  { id: 'query-optimization', title: '🚀 Query Optimization', component: QueryOptimization, time: '15 min' },
+  { id: 'hackerrank-strategy', title: '🎯 HackerRank Strategy', component: HackerRankStrategy, time: '15 min' },
   { id: 'mock', title: '🎬 Mock Test', component: MockTest, time: '60 min' },
   { id: 'cheatsheet', title: '📋 Cheatsheet', component: Cheatsheet, time: '5 min' }
 ]
