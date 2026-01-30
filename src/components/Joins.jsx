@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Quiz from './Quiz'
+import CodeBlock from './CodeBlock'
 
 const quizQuestion = {
   id: 1,
@@ -43,11 +44,9 @@ export default function Joins({ onComplete, isCompleted }) {
         <div>
           <div className="section">
             <h2 className="section-title">INNER JOIN — Only matches</h2>
-            <div className="code-block">
-              <pre><code>{`SELECT u.email, b.amount
+            <CodeBlock code={`SELECT u.email, b.amount
 FROM users u
-INNER JOIN bookings b ON u.user_id = b.user_id;`}</code></pre>
-            </div>
+INNER JOIN bookings b ON u.user_id = b.user_id;`} />
             <p className="section-content mt-1">
               ✅ Result: Only users who HAVE bookings appear.
             </p>
@@ -55,11 +54,9 @@ INNER JOIN bookings b ON u.user_id = b.user_id;`}</code></pre>
 
           <div className="section">
             <h2 className="section-title">LEFT JOIN — All left + matches</h2>
-            <div className="code-block">
-              <pre><code>{`SELECT u.email, b.amount
+            <CodeBlock code={`SELECT u.email, b.amount
 FROM users u
-LEFT JOIN bookings b ON u.user_id = b.user_id;`}</code></pre>
-            </div>
+LEFT JOIN bookings b ON u.user_id = b.user_id;`} />
             <p className="section-content mt-1">
               ✅ Result: ALL users appear. No bookings = NULL.
             </p>
@@ -121,16 +118,13 @@ LEFT JOIN bookings b ON u.user_id = b.user_id;`}</code></pre>
           <p className="section-content mt-2">
             <strong>Example: Find users who never booked</strong>
           </p>
-          <div className="code-block">
-            <pre><code>{`SELECT u.user_id, u.email
+          <CodeBlock code={`SELECT u.user_id, u.email
 FROM users u
 LEFT JOIN bookings b ON u.user_id = b.user_id
-WHERE b.booking_id IS NULL;    -- No match found`}</code></pre>
-          </div>
+WHERE b.booking_id IS NULL;    -- No match found`} />
 
           <p className="section-content mt-2"><strong>Other examples:</strong></p>
-          <div className="code-block">
-            <pre><code>{`-- Hotels with no bookings
+          <CodeBlock code={`-- Hotels with no bookings
 SELECT h.* FROM hotels h
 LEFT JOIN bookings b ON h.hotel_id = b.hotel_id
 WHERE b.booking_id IS NULL;
@@ -138,8 +132,7 @@ WHERE b.booking_id IS NULL;
 -- Users who searched but never converted
 SELECT DISTINCT s.user_id FROM searches s
 LEFT JOIN bookings b ON s.user_id = b.user_id
-WHERE b.booking_id IS NULL;`}</code></pre>
-          </div>
+WHERE b.booking_id IS NULL;`} />
         </div>
       )}
 
@@ -148,8 +141,8 @@ WHERE b.booking_id IS NULL;`}</code></pre>
           <h2 className="section-title">⚠️ Common JOIN Mistake</h2>
           <p className="section-content"><strong>LEFT JOIN then filtering away NULLs</strong></p>
 
-          <div className="code-block mt-2">
-            <pre><code>{`-- ❌ WRONG: Removes users with no completed bookings!
+          <div className="mt-2">
+            <CodeBlock code={`-- ❌ WRONG: Removes users with no completed bookings!
 SELECT u.email, b.amount
 FROM users u
 LEFT JOIN bookings b ON u.user_id = b.user_id
@@ -159,7 +152,7 @@ WHERE b.status = 'completed';   -- Filters out NULLs!
 SELECT u.email, b.amount
 FROM users u
 LEFT JOIN bookings b ON u.user_id = b.user_id
-                    AND b.status = 'completed';`}</code></pre>
+                    AND b.status = 'completed';`} />
           </div>
 
           <div className="alert alert-warning mt-2">

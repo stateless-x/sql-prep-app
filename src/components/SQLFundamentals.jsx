@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import CodeBlock from './CodeBlock'
 
 export default function SQLFundamentals({ onComplete, isCompleted }) {
   const [activeTab, setActiveTab] = useState('order')
@@ -36,8 +37,8 @@ export default function SQLFundamentals({ onComplete, isCompleted }) {
             Memorize this. It explains 80% of SQL "weird" behavior!
           </div>
 
-          <div className="code-block mt-2">
-            <pre><code>{`YOU WRITE:              DATABASE RUNS:
+          <div className="mt-2">
+            <CodeBlock code={`YOU WRITE:              DATABASE RUNS:
 ───────────             ───────────────
 1. SELECT               1. FROM        ← Pick tables
 2. FROM                 2. JOIN        ← Combine tables
@@ -46,13 +47,12 @@ export default function SQLFundamentals({ onComplete, isCompleted }) {
 5. GROUP BY             5. HAVING      ← Filter groups
 6. HAVING               6. SELECT      ← Create columns/aliases
 7. ORDER BY             7. ORDER BY    ← Sort
-8. LIMIT                8. LIMIT       ← Cut off`}</code></pre>
+8. LIMIT                8. LIMIT       ← Cut off`} />
           </div>
 
           <div className="section mt-2">
             <h3 className="section-title">Why This Matters</h3>
-            <div className="code-block">
-              <pre><code>{`-- ❌ FAILS: Alias doesn't exist when WHERE runs
+            <CodeBlock code={`-- ❌ FAILS: Alias doesn't exist when WHERE runs
 SELECT user_id, SUM(amount) AS total
 FROM bookings
 WHERE total > 1000    -- ERROR! SELECT hasn't run yet
@@ -62,8 +62,7 @@ GROUP BY user_id;
 SELECT user_id, SUM(amount) AS total
 FROM bookings
 GROUP BY user_id
-HAVING SUM(amount) > 1000;`}</code></pre>
-            </div>
+HAVING SUM(amount) > 1000;`} />
           </div>
 
           <div className="alert alert-info mt-2">
@@ -83,8 +82,8 @@ HAVING SUM(amount) > 1000;`}</code></pre>
             Always ask yourself: "In my result, what is ONE row?"
           </p>
 
-          <div className="code-block mt-2">
-            <pre><code>{`-- Grain: ONE ROW = ONE BOOKING
+          <div className="mt-2">
+            <CodeBlock code={`-- Grain: ONE ROW = ONE BOOKING
 SELECT * FROM bookings;
 
 -- Grain: ONE ROW = ONE USER
@@ -93,7 +92,7 @@ SELECT user_id, SUM(amount) FROM bookings GROUP BY user_id;
 -- Grain: ONE ROW = ONE USER-HOTEL COMBINATION
 SELECT user_id, hotel_id, COUNT(*)
 FROM bookings
-GROUP BY user_id, hotel_id;`}</code></pre>
+GROUP BY user_id, hotel_id;`} />
           </div>
 
           <div className="alert alert-success mt-2">
@@ -108,45 +107,33 @@ GROUP BY user_id, hotel_id;`}</code></pre>
 
           <div className="card">
             <h3 className="card-title">1. SELECT — What columns</h3>
-            <div className="code-block">
-              <pre><code>{`SELECT user_id, email, amount * 1.1 AS amount_with_tax`}</code></pre>
-            </div>
+            <CodeBlock code={`SELECT user_id, email, amount * 1.1 AS amount_with_tax`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">2. FROM / JOIN — What tables</h3>
-            <div className="code-block">
-              <pre><code>{`FROM bookings b
-JOIN users u ON b.user_id = u.user_id`}</code></pre>
-            </div>
+            <CodeBlock code={`FROM bookings b
+JOIN users u ON b.user_id = u.user_id`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">3. WHERE — Filter rows BEFORE grouping</h3>
-            <div className="code-block">
-              <pre><code>{`WHERE status = 'completed' AND amount > 100`}</code></pre>
-            </div>
+            <CodeBlock code={`WHERE status = 'completed' AND amount > 100`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">4. GROUP BY — Collapse rows</h3>
-            <div className="code-block">
-              <pre><code>{`GROUP BY user_id    -- Now one row per user`}</code></pre>
-            </div>
+            <CodeBlock code={`GROUP BY user_id    -- Now one row per user`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">5. HAVING — Filter groups AFTER grouping</h3>
-            <div className="code-block">
-              <pre><code>{`HAVING COUNT(*) >= 5 AND SUM(amount) > 1000`}</code></pre>
-            </div>
+            <CodeBlock code={`HAVING COUNT(*) >= 5 AND SUM(amount) > 1000`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">6. ORDER BY / LIMIT — Sort and cut</h3>
-            <div className="code-block">
-              <pre><code>{`ORDER BY total DESC LIMIT 10`}</code></pre>
-            </div>
+            <CodeBlock code={`ORDER BY total DESC LIMIT 10`} />
           </div>
         </div>
       )}
@@ -157,22 +144,18 @@ JOIN users u ON b.user_id = u.user_id`}</code></pre>
 
           <div className="card">
             <h3 className="card-title">DISTINCT — Remove duplicates</h3>
-            <div className="code-block">
-              <pre><code>{`-- Get unique countries
+            <CodeBlock code={`-- Get unique countries
 SELECT DISTINCT country FROM users;
 
 -- Unique combinations
-SELECT DISTINCT country, account_type FROM users;`}</code></pre>
-            </div>
+SELECT DISTINCT country, account_type FROM users;`} />
             <p className="mt-1"><strong>When to use:</strong> Simple deduplication, no aggregates needed</p>
           </div>
 
           <div className="card">
             <h3 className="card-title">GROUP BY — Dedupe + aggregate</h3>
-            <div className="code-block">
-              <pre><code>{`-- Count users per country
-SELECT country, COUNT(*) FROM users GROUP BY country;`}</code></pre>
-            </div>
+            <CodeBlock code={`-- Count users per country
+SELECT country, COUNT(*) FROM users GROUP BY country;`} />
             <p className="mt-1"><strong>When to use:</strong> When you need counts, sums, or other aggregates</p>
           </div>
 
@@ -202,8 +185,8 @@ SELECT country, COUNT(*) FROM users GROUP BY country;`}</code></pre>
             </table>
           </div>
 
-          <div className="code-block mt-2">
-            <pre><code>{`-- Combine results from two queries
+          <div className="mt-2">
+            <CodeBlock code={`-- Combine results from two queries
 SELECT user_id FROM premium_users
 UNION ALL
 SELECT user_id FROM trial_users;
@@ -211,7 +194,7 @@ SELECT user_id FROM trial_users;
 -- Remove duplicates if user is in both
 SELECT user_id FROM premium_users
 UNION
-SELECT user_id FROM trial_users;`}</code></pre>
+SELECT user_id FROM trial_users;`} />
           </div>
 
           <div className="alert alert-warning mt-2">
@@ -231,21 +214,18 @@ SELECT user_id FROM trial_users;`}</code></pre>
 
           <div className="card mt-2">
             <h3 className="card-title">Checking for NULL</h3>
-            <div className="code-block">
-              <pre><code>{`-- ❌ WRONG: Never use = or !=
+            <CodeBlock code={`-- ❌ WRONG: Never use = or !=
 WHERE country = NULL    -- Always returns no rows!
 WHERE country != NULL   -- Always returns no rows!
 
 -- ✅ RIGHT: Use IS NULL / IS NOT NULL
 WHERE country IS NULL
-WHERE country IS NOT NULL`}</code></pre>
-            </div>
+WHERE country IS NOT NULL`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">COALESCE — Default values</h3>
-            <div className="code-block">
-              <pre><code>{`-- Return first non-NULL value
+            <CodeBlock code={`-- Return first non-NULL value
 SELECT
     user_id,
     COALESCE(phone, email, 'No contact') AS contact
@@ -256,33 +236,28 @@ SELECT
     hotel_id,
     COALESCE(SUM(amount), 0) AS total_revenue
 FROM bookings
-GROUP BY hotel_id;`}</code></pre>
-            </div>
+GROUP BY hotel_id;`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">NULLIF — Avoid divide by zero</h3>
-            <div className="code-block">
-              <pre><code>{`-- Without NULLIF - crashes if bookings = 0
+            <CodeBlock code={`-- Without NULLIF - crashes if bookings = 0
 revenue / bookings
 
 -- With NULLIF - returns NULL instead of error
-revenue / NULLIF(bookings, 0)`}</code></pre>
-            </div>
+revenue / NULLIF(bookings, 0)`} />
           </div>
 
           <div className="card">
             <h3 className="card-title">NULL in aggregates</h3>
-            <div className="code-block">
-              <pre><code>{`-- COUNT(*) counts all rows
+            <CodeBlock code={`-- COUNT(*) counts all rows
 SELECT COUNT(*) FROM users;  -- Includes rows with NULL
 
 -- COUNT(column) ignores NULLs
 SELECT COUNT(phone) FROM users;  -- Only counts non-NULL phones
 
 -- Other aggregates (SUM, AVG, etc.) ignore NULLs
-SELECT AVG(rating) FROM reviews;  -- NULLs not included in average`}</code></pre>
-            </div>
+SELECT AVG(rating) FROM reviews;  -- NULLs not included in average`} />
           </div>
 
           <div className="alert alert-info mt-2">

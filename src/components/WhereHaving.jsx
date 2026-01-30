@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Quiz from './Quiz'
+import CodeBlock from './CodeBlock'
 
 const quizQuestion = {
   id: 1,
@@ -57,8 +58,8 @@ export default function WhereHaving({ onComplete, isCompleted }) {
           </table>
         </div>
 
-        <div className="code-block mt-2">
-          <pre><code>{`rows → [WHERE filters rows] → [GROUP BY collapses] → [HAVING filters groups] → result`}</code></pre>
+        <div className="mt-2">
+          <CodeBlock code={`rows → [WHERE filters rows] → [GROUP BY collapses] → [HAVING filters groups] → result`} />
         </div>
       </div>
 
@@ -68,19 +69,18 @@ export default function WhereHaving({ onComplete, isCompleted }) {
           <strong>"Users who spent over $5000, but only count completed bookings"</strong>
         </p>
 
-        <div className="code-block mt-2">
-          <pre><code>{`SELECT user_id, SUM(amount) AS total_spent
+        <div className="mt-2">
+          <CodeBlock code={`SELECT user_id, SUM(amount) AS total_spent
 FROM bookings
 WHERE status = 'completed'    -- Row filter (before grouping)
 GROUP BY user_id
-HAVING SUM(amount) > 5000;    -- Group filter (after grouping)`}</code></pre>
+HAVING SUM(amount) > 5000;    -- Group filter (after grouping)`} />
         </div>
       </div>
 
       <div className="section">
         <h2 className="section-title">Common Mistakes</h2>
-        <div className="code-block">
-          <pre><code>{`-- ❌ WRONG: Aggregate in WHERE
+        <CodeBlock code={`-- ❌ WRONG: Aggregate in WHERE
 SELECT user_id, SUM(amount)
 FROM bookings
 WHERE SUM(amount) > 5000      -- ERROR!
@@ -97,14 +97,12 @@ SELECT user_id, SUM(amount)
 FROM bookings
 WHERE status = 'completed'    -- Rows
 GROUP BY user_id
-HAVING SUM(amount) > 5000;    -- Groups`}</code></pre>
-        </div>
+HAVING SUM(amount) > 5000;    -- Groups`} />
       </div>
 
       <div className="section">
         <h2 className="section-title">Decision Tree</h2>
-        <div className="code-block">
-          <pre><code>{`Is the condition about...
+        <CodeBlock code={`Is the condition about...
 
 ├── Individual rows (before grouping)?
 │   └── Use WHERE
@@ -112,8 +110,7 @@ HAVING SUM(amount) > 5000;    -- Groups`}</code></pre>
 │
 └── Aggregated results (after grouping)?
     └── Use HAVING
-    └── Examples: SUM(amount) > 1000, COUNT(*) >= 5`}</code></pre>
-        </div>
+    └── Examples: SUM(amount) > 1000, COUNT(*) >= 5`} />
       </div>
 
       <div className="section">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import CodeBlock from './CodeBlock'
 
 const patterns = [
   {
@@ -181,9 +182,7 @@ export default function CommonPatterns({ onComplete, isCompleted }) {
 
         <div className="card mt-2">
           <h3 className="card-title">{patterns[selectedPattern].title}</h3>
-          <div className="code-block">
-            <pre><code>{patterns[selectedPattern].code}</code></pre>
-          </div>
+          <CodeBlock code={patterns[selectedPattern].code} />
         </div>
       </div>
 

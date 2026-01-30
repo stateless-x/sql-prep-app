@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Quiz from './Quiz'
+import CodeBlock from './CodeBlock'
 
 const quizQuestions = [
   {
@@ -150,12 +151,10 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
       {activeTab === 'syntax' && (
         <div className="section">
           <h2 className="section-title">The Syntax</h2>
-          <div className="code-block">
-            <pre><code>{`FUNCTION() OVER (
+          <CodeBlock code={`FUNCTION() OVER (
     PARTITION BY [group_column]   -- Restart per group
     ORDER BY [order_column]       -- Order within group
-)`}</code></pre>
-          </div>
+)`} />
 
           <div className="table-container mt-2">
             <table>
@@ -186,8 +185,7 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
       {activeTab === 'running' && (
         <div className="section">
           <h2 className="section-title">Running Total</h2>
-          <div className="code-block">
-            <pre><code>{`SELECT
+          <CodeBlock code={`SELECT
     user_id,
     booking_date,
     amount,
@@ -195,8 +193,7 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
         PARTITION BY user_id
         ORDER BY booking_date
     ) AS running_total
-FROM bookings;`}</code></pre>
-          </div>
+FROM bookings;`} />
 
           <p className="section-content mt-2"><strong>Result:</strong></p>
           <div className="table-container mt-2">

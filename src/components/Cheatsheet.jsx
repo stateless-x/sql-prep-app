@@ -1,3 +1,5 @@
+import CodeBlock from './CodeBlock'
+
 export default function Cheatsheet({ onComplete, isCompleted }) {
   return (
     <div className="chapter">
@@ -12,9 +14,7 @@ export default function Cheatsheet({ onComplete, isCompleted }) {
 
       <div className="section">
         <h2 className="section-title">Execution Order</h2>
-        <div className="code-block">
-          <pre><code>FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</code></pre>
-        </div>
+        <CodeBlock code={`FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT`} />
       </div>
 
       <div className="section">
@@ -74,23 +74,19 @@ export default function Cheatsheet({ onComplete, isCompleted }) {
 
       <div className="section">
         <h2 className="section-title">Aggregates</h2>
-        <div className="code-block">
-          <pre><code>{`COUNT(*), COUNT(col), SUM(), AVG(), MAX(), MIN()`}</code></pre>
-        </div>
+        <CodeBlock code={`COUNT(*), COUNT(col), SUM(), AVG(), MAX(), MIN()`} />
       </div>
 
       <div className="section">
         <h2 className="section-title">Window Functions</h2>
-        <div className="code-block">
-          <pre><code>{`FUNCTION() OVER (PARTITION BY x ORDER BY y)
+        <CodeBlock code={`FUNCTION() OVER (PARTITION BY x ORDER BY y)
 
 ROW_NUMBER()  -- 1,2,3,4
 RANK()        -- 1,1,3,4
 DENSE_RANK()  -- 1,1,2,3
 SUM() OVER    -- Running total
 LAG()         -- Previous row
-LEAD()        -- Next row`}</code></pre>
-        </div>
+LEAD()        -- Next row`} />
       </div>
 
       <div className="section">
@@ -98,56 +94,44 @@ LEAD()        -- Next row`}</code></pre>
 
         <div className="card">
           <h3 className="card-title">Top N per group</h3>
-          <div className="code-block">
-            <pre><code>{`WITH ranked AS (
+          <CodeBlock code={`WITH ranked AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY g ORDER BY v DESC
         ) AS rn
     FROM t
 )
-SELECT * FROM ranked WHERE rn <= N;`}</code></pre>
-          </div>
+SELECT * FROM ranked WHERE rn <= N;`} />
         </div>
 
         <div className="card">
           <h3 className="card-title">Find missing</h3>
-          <div className="code-block">
-            <pre><code>{`SELECT * FROM a
+          <CodeBlock code={`SELECT * FROM a
 LEFT JOIN b ON ...
-WHERE b.id IS NULL;`}</code></pre>
-          </div>
+WHERE b.id IS NULL;`} />
         </div>
 
         <div className="card">
           <h3 className="card-title">Running total</h3>
-          <div className="code-block">
-            <pre><code>{`SUM(x) OVER (PARTITION BY g ORDER BY d)`}</code></pre>
-          </div>
+          <CodeBlock code={`SUM(x) OVER (PARTITION BY g ORDER BY d)`} />
         </div>
 
         <div className="card">
           <h3 className="card-title">Compare to previous</h3>
-          <div className="code-block">
-            <pre><code>{`x - LAG(x) OVER (PARTITION BY g ORDER BY d)`}</code></pre>
-          </div>
+          <CodeBlock code={`x - LAG(x) OVER (PARTITION BY g ORDER BY d)`} />
         </div>
 
         <div className="card">
           <h3 className="card-title">Conversion rate</h3>
-          <div className="code-block">
-            <pre><code>{`100.0 * SUM(CASE WHEN converted THEN 1 ELSE 0 END) / COUNT(*)`}</code></pre>
-          </div>
+          <CodeBlock code={`100.0 * SUM(CASE WHEN converted THEN 1 ELSE 0 END) / COUNT(*)`} />
         </div>
       </div>
 
       <div className="section">
         <h2 className="section-title">NULL Handling</h2>
-        <div className="code-block">
-          <pre><code>{`IS NULL / IS NOT NULL
+        <CodeBlock code={`IS NULL / IS NOT NULL
 COALESCE(col, default)
-col / NULLIF(divisor, 0)  -- Avoid divide by zero`}</code></pre>
-        </div>
+col / NULLIF(divisor, 0)  -- Avoid divide by zero`} />
       </div>
 
       <div className="section">

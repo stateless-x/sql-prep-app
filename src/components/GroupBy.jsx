@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Quiz from './Quiz'
+import CodeBlock from './CodeBlock'
 
 const quizQuestion = {
   id: 1,
@@ -98,8 +99,8 @@ export default function GroupBy({ onComplete, isCompleted }) {
           2. Inside an aggregate function
         </div>
 
-        <div className="code-block mt-2">
-          <pre><code>{`-- ❌ WRONG: email not in GROUP BY or aggregate
+        <div className="mt-2">
+          <CodeBlock code={`-- ❌ WRONG: email not in GROUP BY or aggregate
 SELECT user_id, email, SUM(amount)
 FROM bookings
 GROUP BY user_id;
@@ -107,7 +108,7 @@ GROUP BY user_id;
 -- ✅ RIGHT
 SELECT user_id, SUM(amount)
 FROM bookings
-GROUP BY user_id;`}</code></pre>
+GROUP BY user_id;`} />
         </div>
       </div>
 
@@ -153,13 +154,11 @@ GROUP BY user_id;`}</code></pre>
 
       <div className="section">
         <h2 className="section-title">Conditional Aggregation</h2>
-        <div className="code-block">
-          <pre><code>{`-- Count only completed bookings
+        <CodeBlock code={`-- Count only completed bookings
 SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed
 
 -- Calculate conversion rate
-ROUND(100.0 * SUM(CASE WHEN converted THEN 1 ELSE 0 END) / COUNT(*), 2) AS conv_rate`}</code></pre>
-        </div>
+ROUND(100.0 * SUM(CASE WHEN converted THEN 1 ELSE 0 END) / COUNT(*), 2) AS conv_rate`} />
       </div>
 
       <div className="section">
