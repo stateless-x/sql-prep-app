@@ -32,6 +32,14 @@ export default function WhereHaving({ onComplete, isCompleted }) {
         <strong>⚠️ CRITICAL:</strong> This is where many people fail. Master this!
       </div>
 
+      <div className="alert alert-info">
+        <strong>🎯 Real-World Analogy:</strong><br />
+        <strong>WHERE</strong> = Security guard at the door (filters people BEFORE they enter)<br />
+        <strong>HAVING</strong> = Manager checking teams AFTER they've been formed<br />
+        <br />
+        WHERE checks individual records → HAVING checks summary/group totals
+      </div>
+
       <div className="section">
         <h2 className="section-title">The Rule (Memorize This)</h2>
         <div className="table-container">
@@ -64,40 +72,96 @@ export default function WhereHaving({ onComplete, isCompleted }) {
       </div>
 
       <div className="section">
-        <h2 className="section-title">Example</h2>
-        <p className="section-content">
-          <strong>"Users who spent over $5000, but only count completed bookings"</strong>
-        </p>
+        <h2 className="section-title">Real Example: Step-by-Step</h2>
+
+        <div className="card">
+          <h3 className="card-title">Business Question</h3>
+          <p>
+            <strong>"Find high-value users who spent over $5000, but only count completed bookings (ignore cancelled/pending)"</strong>
+          </p>
+        </div>
+
+        <div className="card mt-2">
+          <h3 className="card-title">Breaking It Down</h3>
+          <p>
+            Two different filters needed:<br />
+            <br />
+            1️⃣ <strong>"Only count completed bookings"</strong><br />
+            → This filters INDIVIDUAL rows (each booking's status)<br />
+            → Use WHERE status = 'completed'<br />
+            → Happens BEFORE grouping<br />
+            <br />
+            2️⃣ <strong>"Users who spent over $5000"</strong><br />
+            → This filters by TOTAL spent (sum across a user's bookings)<br />
+            → Use HAVING SUM(amount) > 5000<br />
+            → Happens AFTER grouping (because you need the SUM first!)
+          </p>
+        </div>
 
         <div className="mt-2">
           <CodeBlock code={`SELECT user_id, SUM(amount) AS total_spent
 FROM bookings
-WHERE status = 'completed'    -- Row filter (before grouping)
-GROUP BY user_id
-HAVING SUM(amount) > 5000;    -- Group filter (after grouping)`} />
+WHERE status = 'completed'    -- ⬅️ Step 1: Filter individual rows
+GROUP BY user_id              -- ⬅️ Step 2: Collapse into groups
+HAVING SUM(amount) > 5000;    -- ⬅️ Step 3: Filter groups by their totals
+
+-- Execution order:
+-- 1. WHERE removes cancelled/pending bookings (filters 1000 rows → 600 rows)
+-- 2. GROUP BY collapses 600 rows into 50 users
+-- 3. HAVING keeps only users with total > $5000 (filters 50 users → 12 users)
+-- Result: 12 rows (high-value users)`} />
         </div>
       </div>
 
       <div className="section">
         <h2 className="section-title">Common Mistakes</h2>
-        <CodeBlock code={`-- ❌ WRONG: Aggregate in WHERE
-SELECT user_id, SUM(amount)
-FROM bookings
-WHERE SUM(amount) > 5000      -- ERROR!
-GROUP BY user_id;
 
--- ❌ WRONG: Row filter in HAVING
-SELECT user_id, SUM(amount)
+        <div className="card">
+          <h3 className="card-title">❌ Mistake #1: Aggregate in WHERE</h3>
+          <CodeBlock code={`SELECT user_id, SUM(amount)
+FROM bookings
+WHERE SUM(amount) > 5000      -- ERROR! SUM doesn't exist yet!
+GROUP BY user_id;`} />
+          <p className="mt-1">
+            <strong style={{ color: 'var(--danger)' }}>Why it fails:</strong><br />
+            WHERE runs BEFORE GROUP BY. At this point, there are no groups yet!<br />
+            SUM(amount) doesn't exist until after GROUP BY happens.<br />
+            <br />
+            <strong style={{ color: 'var(--success)' }}>Fix:</strong> Move to HAVING
+          </p>
+        </div>
+
+        <div className="card mt-2">
+          <h3 className="card-title">❌ Mistake #2: Row-level filter in HAVING</h3>
+          <CodeBlock code={`SELECT user_id, SUM(amount)
 FROM bookings
 GROUP BY user_id
-HAVING status = 'completed';  -- Should be WHERE
+HAVING status = 'completed';  -- WRONG! status is a row-level column`} />
+          <p className="mt-1">
+            <strong style={{ color: 'var(--danger)' }}>Why it's wrong:</strong><br />
+            HAVING is for filtering GROUPS, not individual rows.<br />
+            'status' is a property of individual bookings, not of a user group.<br />
+            Also inefficient: filters AFTER grouping instead of before.<br />
+            <br />
+            <strong style={{ color: 'var(--success)' }}>Fix:</strong> Move to WHERE (filters before grouping = faster!)
+          </p>
+        </div>
 
--- ✅ RIGHT
-SELECT user_id, SUM(amount)
+        <div className="card mt-2">
+          <h3 className="card-title">✅ The Right Way</h3>
+          <CodeBlock code={`SELECT user_id, SUM(amount)
 FROM bookings
-WHERE status = 'completed'    -- Rows
-GROUP BY user_id
-HAVING SUM(amount) > 5000;    -- Groups`} />
+WHERE status = 'completed'    -- ✅ Filter rows first (individual records)
+GROUP BY user_id              -- Then group what's left
+HAVING SUM(amount) > 5000;    -- ✅ Then filter groups (aggregated totals)`} />
+          <p className="mt-1">
+            <strong style={{ color: 'var(--success)' }}>Why this works:</strong><br />
+            1. WHERE filters out cancelled bookings BEFORE expensive GROUP BY operation<br />
+            2. GROUP BY only processes completed bookings<br />
+            3. HAVING filters the final aggregated results<br />
+            Result: Faster + correct!
+          </p>
+        </div>
       </div>
 
       <div className="section">

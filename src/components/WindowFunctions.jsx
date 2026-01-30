@@ -70,16 +70,33 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
       {activeTab === 'intro' && (
         <div className="section">
           <h2 className="section-title">Why Window Functions Exist</h2>
-          <p className="section-content">
-            <strong>Problem:</strong> GROUP BY collapses rows. Sometimes you want to:
-          </p>
-          <ul>
-            <li>Keep all rows</li>
-            <li>Add calculated columns based on groups</li>
-          </ul>
+
+          <div className="alert alert-info">
+            <strong>🎯 The Core Problem Window Functions Solve:</strong><br />
+            GROUP BY makes you choose: keep details OR calculate totals.<br />
+            Window Functions say: "Why not BOTH?"
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Real-World Scenario</h3>
+            <p>
+              <strong>Business asks:</strong> "Show me each booking with the user's total spend"<br />
+              <br />
+              You need:<br />
+              • Each individual booking (all rows preserved)<br />
+              • AND the user's total across ALL their bookings<br />
+              <br />
+              <strong style={{ color: 'var(--danger)' }}>Problem:</strong> GROUP BY user_id would collapse rows → lose individual booking details<br />
+              <strong style={{ color: 'var(--success)' }}>Solution:</strong> Window functions → keep all rows + add calculated column
+            </p>
+          </div>
 
           <p className="section-content mt-2">
-            <strong>Solution:</strong> Window functions — aggregate WITHOUT collapsing!
+            <strong>What Window Functions Do:</strong><br />
+            1. Look at a "window" of related rows (like a group)<br />
+            2. Calculate something across that window<br />
+            3. Add the result to EVERY row in the window<br />
+            4. Keep ALL original rows (no collapsing!)
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
@@ -142,8 +159,30 @@ export default function WindowFunctions({ onComplete, isCompleted }) {
             </div>
           </div>
 
-          <div className="alert alert-info mt-2">
+          <div className="alert alert-success mt-2">
+            <strong>✅ See the Difference?</strong><br />
+            <br />
+            <strong>GROUP BY:</strong><br />
+            • User 1's two bookings (200, 350) → collapsed into ONE row<br />
+            • Result: 2 rows total, lost individual booking details<br />
+            <br />
+            <strong>Window Function:</strong><br />
+            • User 1's two bookings → BOTH rows still there!<br />
+            • Added a new column "user_total" showing 550 on BOTH rows<br />
+            • Result: All 3 original rows preserved + extra calculated column<br />
+            <br />
             <strong>Key Insight:</strong> PARTITION BY = GROUP BY without collapsing
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Common Use Cases</h3>
+            <ul>
+              <li><strong>Running totals:</strong> Show cumulative sum while keeping all transactions</li>
+              <li><strong>Rankings:</strong> Rank items within groups (top products per category)</li>
+              <li><strong>Comparisons:</strong> Compare each row to previous/next row or group average</li>
+              <li><strong>Top N per group:</strong> Find top 3 hotels per city (MOST common interview question!)</li>
+              <li><strong>Percentages:</strong> "This booking is X% of user's total spend"</li>
+            </ul>
           </div>
         </div>
       )}
