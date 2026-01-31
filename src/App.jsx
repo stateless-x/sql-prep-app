@@ -7,8 +7,10 @@ import SQLFundamentals from './components/SQLFundamentals'
 import GroupBy from './components/GroupBy'
 import WhereHaving from './components/WhereHaving'
 import Joins from './components/Joins'
+import CTEs from './components/CTEs'
 import WindowFunctionsPatterns from './components/WindowFunctionsPatterns'
 import InterviewPatterns from './components/InterviewPatterns'
+import BusinessCase from './components/BusinessCase'
 import QueryOptimization from './components/QueryOptimization'
 import SQLReference from './components/SQLReference'
 import MockTest from './components/MockTest'
@@ -19,9 +21,11 @@ const CHAPTERS = [
   { id: 'fundamentals', title: '🧠 SQL Fundamentals', component: SQLFundamentals, time: '25 min' },
   { id: 'groupby', title: '📊 GROUP BY & Aggregates', component: GroupBy, time: '15 min' },
   { id: 'where-having', title: '⚖️ WHERE vs HAVING', component: WhereHaving, time: '10 min' },
-  { id: 'joins', title: '🔗 JOINs', component: Joins, time: '20 min' },
+  { id: 'joins', title: '🔗 JOINs & Subqueries', component: Joins, time: '30 min' },
+  { id: 'ctes', title: '🏗️ CTEs & Multi-Step Queries', component: CTEs, time: '30 min' },
   { id: 'window', title: '🪟 Window Functions & Patterns', component: WindowFunctionsPatterns, time: '40 min' },
   { id: 'interview-patterns', title: '🎯 Interview Patterns & Strategy', component: InterviewPatterns, time: '40 min' },
+  { id: 'business-case', title: '📈 Business Case Analysis', component: BusinessCase, time: '25 min' },
   { id: 'query-optimization', title: '🚀 Query Optimization', component: QueryOptimization, time: '15 min' },
   { id: 'sql-reference', title: '📋 SQL Reference & Cheatsheet', component: SQLReference, time: '35 min' },
   { id: 'mock', title: '🎬 Mock Test', component: MockTest, time: '60 min' }

@@ -1,35 +1,64 @@
 import { useState } from 'react'
 import CodeBlock from './CodeBlock'
+import LearningObjectives from './LearningObjectives'
+import TLDRBox from './TLDRBox'
+import KeyTakeaways from './KeyTakeaways'
+import TryThis from './TryThis'
 
 export default function SQLFundamentals({ onComplete, isCompleted }) {
   const [activeTab, setActiveTab] = useState('order')
+
+  const tabs = [
+    { id: 'order', label: '🔄 Execution Order', time: '4 min' },
+    { id: 'grain', label: '🌾 Know Your Grain', time: '4 min' },
+    { id: 'ops', label: '⚙️ Core Operations', time: '5 min' },
+    { id: 'ctes-preview', label: '🏗️ CTEs Preview', time: '3 min' },
+    { id: 'subqueries-preview', label: '🔍 Subqueries Preview', time: '3 min' },
+    { id: 'distinct', label: '🔂 DISTINCT & UNION', time: '3 min' },
+    { id: 'nulls', label: '⚡ NULL Handling', time: '4 min' },
+    { id: 'complex', label: '🧩 Reading Complex SQL', time: '3 min' }
+  ]
 
   return (
     <div className="chapter">
       <div className="chapter-header">
         <h1 className="chapter-title">🧠 SQL Fundamentals</h1>
-        <p className="chapter-subtitle">Master the mental model</p>
+        <p className="chapter-subtitle">Master the mental model for Agoda interviews</p>
       </div>
 
+      <LearningObjectives
+        objectives={[
+          'Understand SQL execution order (why errors happen!)',
+          'Master the concept of "grain" (what is one row?)',
+          'Know the 6 core building blocks (SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY)',
+          'Preview CTEs and Subqueries (you\'ll master these in later chapters)',
+          'Handle NULL values correctly (critical for interviews!)'
+        ]}
+        time="25 min"
+      />
+
+      <TLDRBox
+        points={[
+          'Execution order: FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT',
+          'Grain = what does one row represent? (one booking vs one user)',
+          'WHERE = filter rows BEFORE grouping | HAVING = filter AFTER grouping',
+          'CTEs (WITH clauses) make complex queries readable - Agoda loves these!',
+          'NULL ≠ empty ≠ 0. Use IS NULL, not = NULL',
+          'Always ask: Can this column be NULL? What should happen?'
+        ]}
+      />
+
+      {/* Tab Navigation */}
       <div className="tabs">
-        <button className={`tab ${activeTab === 'order' ? 'active' : ''}`} onClick={() => setActiveTab('order')}>
-          🔄 Execution Order
-        </button>
-        <button className={`tab ${activeTab === 'grain' ? 'active' : ''}`} onClick={() => setActiveTab('grain')}>
-          🌾 Know Your Grain
-        </button>
-        <button className={`tab ${activeTab === 'ops' ? 'active' : ''}`} onClick={() => setActiveTab('ops')}>
-          ⚙️ Core Operations
-        </button>
-        <button className={`tab ${activeTab === 'distinct' ? 'active' : ''}`} onClick={() => setActiveTab('distinct')}>
-          🔍 DISTINCT & UNION
-        </button>
-        <button className={`tab ${activeTab === 'nulls' ? 'active' : ''}`} onClick={() => setActiveTab('nulls')}>
-          ⚡ NULL Handling
-        </button>
-        <button className={`tab ${activeTab === 'complex' ? 'active' : ''}`} onClick={() => setActiveTab('complex')}>
-          🧩 Reading Complex SQL
-        </button>
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            className={`tab ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label} <span className="tab-time">({tab.time})</span>
+          </button>
+        ))}
       </div>
 
       {activeTab === 'order' && (
@@ -687,6 +716,237 @@ WHERE account_type != 'premium' OR account_type IS NULL  -- ✅ Includes NULLs`}
         </div>
       )}
 
+      {/* Tab: CTEs Preview */}
+      {activeTab === 'ctes-preview' && (
+        <div className="section">
+          <h2 className="section-title">🏗️ CTEs Preview (WITH Clauses)</h2>
+
+          <div className="alert alert-warning">
+            <strong>🎯 CRITICAL FOR AGODA:</strong> CTEs appear in 80% of Agoda SQL interviews!
+            This is a preview - you'll master them in Chapter 7.
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">What Are CTEs?</h3>
+            <p>
+              <strong>CTE = Common Table Expression</strong> = A temporary named result set that only exists for one query.
+            </p>
+            <p>
+              Think of it like: <strong>"Let me create a temporary table with a name, so I can reference it later in my query"</strong>
+            </p>
+            <CodeBlock code={`WITH temp_table_name AS (
+    -- Your query here
+    SELECT ...
+)
+-- Now use it like a regular table
+SELECT * FROM temp_table_name;`} />
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">🏨 Simple Agoda Example</h3>
+            <p><strong>Without CTE (messy):</strong></p>
+            <CodeBlock code={`-- Calculate average of hotel averages (confusing!)
+SELECT AVG(avg_rating)
+FROM (
+    SELECT hotel_id, AVG(rating) as avg_rating
+    FROM reviews
+    GROUP BY hotel_id
+) subquery;`} />
+
+            <p className="mt-2"><strong>With CTE (clean!):</strong></p>
+            <CodeBlock code={`WITH hotel_averages AS (
+    SELECT hotel_id, AVG(rating) as avg_rating
+    FROM reviews
+    GROUP BY hotel_id
+)
+SELECT AVG(avg_rating) as platform_average
+FROM hotel_averages;
+
+-- Much easier to read! Each step has a name.`} />
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Why Agoda Loves CTEs</h3>
+            <ul>
+              <li>✅ <strong>Readable:</strong> Break complex logic into named steps</li>
+              <li>✅ <strong>Testable:</strong> Can run each CTE independently to verify</li>
+              <li>✅ <strong>Shows thinking:</strong> Interviewer sees your problem-solving process</li>
+              <li>✅ <strong>Maintainable:</strong> Easy to modify without rewriting everything</li>
+            </ul>
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">Cascading CTEs (What Agoda Tests!)</h3>
+            <p>You can chain multiple CTEs - each one building on previous ones:</p>
+            <CodeBlock code={`WITH step1 AS (
+    -- First: Get user booking counts
+    SELECT user_id, COUNT(*) as booking_count
+    FROM bookings
+    GROUP BY user_id
+),
+step2 AS (
+    -- Second: Classify users (uses step1!)
+    SELECT
+        user_id,
+        booking_count,
+        CASE
+            WHEN booking_count >= 10 THEN 'VIP'
+            WHEN booking_count >= 3 THEN 'Regular'
+            ELSE 'New'
+        END as user_segment
+    FROM step1
+)
+-- Third: Count users per segment
+SELECT user_segment, COUNT(*) as user_count
+FROM step2
+GROUP BY user_segment;
+
+-- Each step builds on the previous!`} />
+          </div>
+
+          <div className="alert alert-info mt-2">
+            <strong>💡 When You'll Master This:</strong><br />
+            Chapter 7 (🏗️ CTEs & Multi-Step Queries) covers:
+            <ul>
+              <li>Simple 1-step CTEs</li>
+              <li>Cascading 2-4 step CTEs (what Agoda tests!)</li>
+              <li>CTEs vs Subqueries (when to use which)</li>
+              <li>CTEs + Window Functions (critical pattern!)</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Subqueries Preview */}
+      {activeTab === 'subqueries-preview' && (
+        <div className="section">
+          <h2 className="section-title">🔍 Subqueries Preview</h2>
+
+          <div className="alert alert-info">
+            <strong>Subquery = A query inside another query</strong><br />
+            You'll master these in Chapter 6 (🔗 JOINs & Subqueries). This is a quick preview!
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">3 Places to Put Subqueries</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Location</th>
+                    <th>Purpose</th>
+                    <th>Example</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>WHERE clause</strong></td>
+                    <td>Filter based on another query</td>
+                    <td><code className="inline-code">WHERE city IN (SELECT ...)</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>FROM clause</strong></td>
+                    <td>Create temporary table</td>
+                    <td><code className="inline-code">FROM (SELECT ...) AS temp</code></td>
+                  </tr>
+                  <tr>
+                    <td><strong>SELECT clause</strong></td>
+                    <td>Calculate column value</td>
+                    <td><code className="inline-code">SELECT (SELECT AVG...)</code></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">🏨 Example 1: Subquery in WHERE</h3>
+            <p><strong>Find hotels in cities with more than 1000 bookings:</strong></p>
+            <CodeBlock code={`SELECT hotel_name, city
+FROM hotels
+WHERE city IN (
+    -- This subquery runs first
+    SELECT city
+    FROM bookings
+    GROUP BY city
+    HAVING COUNT(*) > 1000
+);
+
+-- Subquery returns: ['Bangkok', 'Singapore', 'Tokyo']
+-- Main query filters hotels to those 3 cities`} />
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">🏨 Example 2: Subquery in FROM</h3>
+            <p><strong>Find average of city averages:</strong></p>
+            <CodeBlock code={`SELECT AVG(city_avg) as overall_avg
+FROM (
+    -- This subquery creates a temp table
+    SELECT city, AVG(amount) as city_avg
+    FROM bookings
+    GROUP BY city
+) city_averages;
+
+-- Subquery creates temp table with city averages
+-- Outer query averages those averages`} />
+          </div>
+
+          <div className="card mt-2">
+            <h3 className="card-title">CTE vs Subquery - Which to Use?</h3>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Use Case</th>
+                    <th>CTE</th>
+                    <th>Subquery</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Multi-step logic</td>
+                    <td className="text-success">✅ Better</td>
+                    <td className="text-danger">❌ Messy</td>
+                  </tr>
+                  <tr>
+                    <td>One-time simple filter</td>
+                    <td className="text-warning">⚠️ OK</td>
+                    <td className="text-success">✅ Fine</td>
+                  </tr>
+                  <tr>
+                    <td>Interviews (showing thinking)</td>
+                    <td className="text-success">✅ Use this!</td>
+                    <td className="text-warning">⚠️ Less clear</td>
+                  </tr>
+                  <tr>
+                    <td>Readability</td>
+                    <td className="text-success">✅ Very clear</td>
+                    <td className="text-danger">❌ Nested</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="alert alert-warning mt-2">
+            <strong>🎯 Agoda Interview Tip:</strong><br />
+            When in doubt, use CTEs! They show structured thinking and are easier to debug.
+            Agoda interviewers want to see your problem-solving process.
+          </div>
+
+          <div className="alert alert-info mt-2">
+            <strong>💡 When You'll Master This:</strong><br />
+            Chapter 6 (🔗 JOINs & Subqueries) covers:
+            <ul>
+              <li>Subqueries in WHERE (IN, EXISTS, NOT IN pitfalls)</li>
+              <li>Subqueries in FROM (derived tables)</li>
+              <li>Subqueries in SELECT (correlated subqueries)</li>
+              <li>When to use subqueries vs JOINs vs CTEs</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
       {activeTab === 'complex' && (
         <div className="section">
           <h2 className="section-title">🧩 How to Read Complex SQL</h2>
@@ -829,6 +1089,21 @@ SELECT * FROM ranked_bookings WHERE recency_rank = 1;`} />
           </div>
         </div>
       )}
+
+      <KeyTakeaways
+        points={[
+          'Execution order (FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY) explains 80% of SQL errors',
+          'Grain = what does one row represent? Always identify this before writing queries',
+          'WHERE filters rows BEFORE grouping | HAVING filters groups AFTER grouping',
+          'CTEs (WITH clauses) = Agoda\'s favorite! Makes complex queries readable and testable',
+          'Subqueries: WHERE=filter, FROM=temp table, SELECT=calculated column. Prefer CTEs in interviews!',
+          'NULL ≠ empty ≠ 0. Always use IS NULL, never = NULL',
+          'COUNT(*) includes NULLs | COUNT(column) excludes NULLs - know the difference!',
+          'When reading complex SQL: start with CTEs/innermost subqueries, work outward'
+        ]}
+        nextChapter="Study '📊 GROUP BY & Aggregates' to master aggregations"
+        relatedChapters="'🏗️ CTEs' (Ch 7) and '🔗 JOINs & Subqueries' (Ch 6) expand on previews here"
+      />
 
       <button
         className={`complete-btn ${isCompleted ? 'completed' : ''}`}
