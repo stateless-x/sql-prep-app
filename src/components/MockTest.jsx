@@ -57,6 +57,180 @@ GROUP BY h.hotel_id, h.name, h.city;`
     ) AS running_total
 FROM bookings
 ORDER BY user_id, booking_date;`
+  },
+  {
+    id: 5,
+    title: 'Problem 5 (15 min, 20 pts) ⭐ CTEs - CRITICAL FOR AGODA',
+    question: `User Segmentation with Cascading CTEs:
+
+Segment users into VIP/Regular/New based on their 2024 booking history:
+- VIP: 10+ bookings AND average booking value > $200
+- Regular: 3-9 bookings OR average booking value > $150
+- New: Everything else
+
+Then calculate for each segment:
+- Total number of users
+- Total revenue
+- Average revenue per user
+
+Use CTEs to solve this. Show segment, user_count, segment_revenue, avg_revenue_per_user.`,
+    solution: `WITH user_metrics AS (
+    -- Step 1: Calculate metrics per user
+    SELECT
+        user_id,
+        COUNT(*) as booking_count,
+        AVG(amount) as avg_booking_value,
+        SUM(amount) as total_spent
+    FROM bookings
+    WHERE booking_date >= '2024-01-01'
+    GROUP BY user_id
+),
+user_segments AS (
+    -- Step 2: Classify users into segments
+    SELECT
+        user_id,
+        booking_count,
+        avg_booking_value,
+        total_spent,
+        CASE
+            WHEN booking_count >= 10 AND avg_booking_value > 200 THEN 'VIP'
+            WHEN booking_count >= 3 OR avg_booking_value > 150 THEN 'Regular'
+            ELSE 'New'
+        END as segment
+    FROM user_metrics
+)
+-- Step 3: Aggregate by segment
+SELECT
+    segment,
+    COUNT(user_id) as user_count,
+    SUM(total_spent) as segment_revenue,
+    ROUND(AVG(total_spent), 2) as avg_revenue_per_user
+FROM user_segments
+GROUP BY segment
+ORDER BY segment_revenue DESC;
+
+-- Key pattern: CTE 1 calculates → CTE 2 classifies → Final query aggregates
+-- This 3-step CTE pattern appears in 80% of Agoda interviews!`
+  },
+  {
+    id: 6,
+    title: 'Problem 6 (12 min, 20 pts) ⭐ CTEs + Window Functions',
+    question: `Top 3 Hotels Per City:
+
+Find the top 3 revenue-generating hotels in each city for completed bookings.
+
+Show: city, hotel_name, total_revenue, city_rank
+
+Requirements:
+- Only include completed bookings (status = 'completed')
+- Use CTEs for readability
+- Use ROW_NUMBER() for ranking (no ties)
+- Order final results by city, then city_rank`,
+    solution: `WITH hotel_revenue AS (
+    -- Step 1: Calculate revenue per hotel
+    SELECT
+        h.hotel_id,
+        h.city,
+        h.name as hotel_name,
+        SUM(b.amount) as total_revenue
+    FROM hotels h
+    JOIN bookings b ON h.hotel_id = b.hotel_id
+    WHERE b.status = 'completed'
+    GROUP BY h.hotel_id, h.city, h.name
+),
+ranked_hotels AS (
+    -- Step 2: Rank hotels within each city
+    SELECT
+        city,
+        hotel_name,
+        total_revenue,
+        ROW_NUMBER() OVER (
+            PARTITION BY city
+            ORDER BY total_revenue DESC
+        ) as city_rank
+    FROM hotel_revenue
+)
+-- Step 3: Filter to top 3 per city
+SELECT
+    city,
+    hotel_name,
+    total_revenue,
+    city_rank
+FROM ranked_hotels
+WHERE city_rank <= 3
+ORDER BY city, city_rank;
+
+-- Critical pattern: CTE → window function → filter window results
+-- You CANNOT filter ROW_NUMBER() in WHERE without a CTE!`
+  },
+  {
+    id: 7,
+    title: 'Problem 7 (8 min, 15 pts) ⭐ Business Case Analysis',
+    question: `Revenue Drop Investigation:
+
+Bangkok bookings dropped this month vs last month.
+
+Compare current month vs previous month for Bangkok only. Show:
+- star_rating (hotel star rating)
+- current_month_bookings
+- previous_month_bookings
+- booking_change_pct (percentage change)
+- current_month_avg_value
+- previous_month_avg_value
+- value_change_pct (percentage change in avg booking value)
+
+Use CTEs. Round percentages to 2 decimals. Order by star_rating DESC.
+
+Hint: Use DATE_TRUNC('month', CURRENT_DATE) for current month, subtract INTERVAL '1 month' for previous.`,
+    solution: `WITH current_month AS (
+    -- Step 1: Current month metrics by star rating
+    SELECT
+        h.star_rating,
+        COUNT(*) as bookings,
+        AVG(b.amount) as avg_booking_value
+    FROM bookings b
+    JOIN hotels h ON b.hotel_id = h.hotel_id
+    WHERE h.city = 'Bangkok'
+    AND b.booking_date >= DATE_TRUNC('month', CURRENT_DATE)
+    GROUP BY h.star_rating
+),
+previous_month AS (
+    -- Step 2: Previous month metrics by star rating
+    SELECT
+        h.star_rating,
+        COUNT(*) as bookings,
+        AVG(b.amount) as avg_booking_value
+    FROM bookings b
+    JOIN hotels h ON b.hotel_id = h.hotel_id
+    WHERE h.city = 'Bangkok'
+    AND b.booking_date >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 month'
+    AND b.booking_date < DATE_TRUNC('month', CURRENT_DATE)
+    GROUP BY h.star_rating
+)
+-- Step 3: Compare and calculate changes
+SELECT
+    COALESCE(cm.star_rating, pm.star_rating) as star_rating,
+    COALESCE(cm.bookings, 0) as current_month_bookings,
+    COALESCE(pm.bookings, 0) as previous_month_bookings,
+    ROUND(
+        100.0 * (COALESCE(cm.bookings, 0) - COALESCE(pm.bookings, 0))
+        / NULLIF(pm.bookings, 0),
+        2
+    ) as booking_change_pct,
+    ROUND(COALESCE(cm.avg_booking_value, 0), 2) as current_month_avg_value,
+    ROUND(COALESCE(pm.avg_booking_value, 0), 2) as previous_month_avg_value,
+    ROUND(
+        100.0 * (COALESCE(cm.avg_booking_value, 0) - COALESCE(pm.avg_booking_value, 0))
+        / NULLIF(pm.avg_booking_value, 0),
+        2
+    ) as value_change_pct
+FROM current_month cm
+FULL OUTER JOIN previous_month pm ON cm.star_rating = pm.star_rating
+ORDER BY star_rating DESC;
+
+-- Business insight: Compare booking_change_pct vs value_change_pct
+-- If bookings down but value stable → volume problem (marketing)
+-- If bookings stable but value down → pricing problem`
   }
 ]
 
